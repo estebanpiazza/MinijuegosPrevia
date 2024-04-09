@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minijuego de Flechas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    .score {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    #timer {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Minijuego de Flechas para 4 jugadores</h1>
+  <p>Pulsa las flechas del teclado lo más rápido posible en 10 segundos.</p>
+  <div class="score" id="scores">
+    <p id="player1">Jugador 1: 0</p>
+    <p id="player2">Jugador 2: 0</p>
+    <p id="player3">Jugador 3: 0</p>
+    <p id="player4">Jugador 4: 0</p>
+  </div>
+  <p id="timer">Tiempo restante: 10</p>
+  <button id="startButton">Comenzar juego</button>
+
+  <script>
+    let scores = {
+      player1: 0,
+      player2: 0,
+      player3: 0,
+      player4: 0
+    };
+    let timeLeft = 10;
+    let contador = 0;
+
+    const scoreDisplays = {
+      player1: document.getElementById('player1'),
+      player2: document.getElementById('player2'),
+      player3: document.getElementById('player3'),
+      player4: document.getElementById('player4')
+    };
+    const timerDisplay = document.getElementById('timer');
+    const eleContador = document.getElementById('contador');
+    let timerInterval;
+
+    function updateScore(player) {
+      scores[player]++;
+      if (scoreDisplays[player]) {
+        scoreDisplays[player].textContent = `${player}: ${scores[player]}`;
+      } else {
+        console.error(`Elemento de puntuación para ${player} no encontrado.`);
+      }
+    }
+
+    function updateTimer() {
+      timeLeft--;
+      timerDisplay.textContent = `Tiempo restante: ${timeLeft}`;
+      if (timeLeft === 0) {
+        clearInterval(timerInterval);
+        removeKeyListeners();
+        alert('¡Tiempo terminado! Puntuaciones finales:\n' +
+          `Jugador 1: ${scores.player1}\n` +
+          `Jugador 2: ${scores.player2}\n` +
+          `Jugador 3: ${scores.player3}\n` +
+          `Jugador 4: ${scores.player4}\n` +
+          `Contador total: ${contador}`);
+      }
+    }
+
+    function addKeyListeners() {
+      document.addEventListener('keydown', keydownHandler);
+    }
+
+    function removeKeyListeners() {
+      document.removeEventListener('keydown', keydownHandler);
+    }
+
+    function keydownHandler(event) {
+      const keyCode = event.keyCode;
+      if ([37, 38, 39, 40].includes(keyCode)) {
+        const player = `player${keyCode - 36}`;
+        updateScore(player);
+      }
+    }
+
+    document.body.onkeyup = function(e) {
+      const keyCode = e.keyCode;
+      if ([37, 38, 39, 40].includes(keyCode)) {
+        const player = `player${keyCode - 36}`;
+        contador++;
+        eleContador.innerText = contador;
+      }
+    }
+
+    function startGame() {
+      scores = {
+        player1: 0,
+        player2: 0,
+        player3: 0,
+        player4: 0
+      };
+      timeLeft = 10;
+      contador = 0;
+      for (let player in scores) {
+        scoreDisplays[player].textContent = `${player}: 0`;
+      }
+      timerDisplay.textContent = `Tiempo restante: ${timeLeft}`;
+      eleContador.innerText = contador;
+      addKeyListeners();
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    document.getElementById('startButton').addEventListener('click', startGame);
+  </script>
+</body>
+</html>

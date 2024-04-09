@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Juego de Reacción con Flechas</title>
+<style>
+  body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; gap: 20px; }
+  .circulo { width: 100px; height: 100px; border-radius: 50%; background-color: red; }
+  .resultados { text-align: center; }
+</style>
+</head>
+<body>
+<div class="circulo"></div>
+<div class="resultados"></div>
+<script>
+  const circulo = document.querySelector('.circulo');
+  const resultados = document.querySelector('.resultados');
+  let tiempoInicio;
+  let juegoIniciado = false;
+  let reacciones = [];
+
+  function cambiarColorDespuesDeUnRato() {
+    // Espera un tiempo aleatorio entre 1 y 3 segundos antes de cambiar a verde
+    setTimeout(() => {
+      circulo.style.backgroundColor = 'green';
+      tiempoInicio = Date.now();
+      juegoIniciado = true;
+    }, Math.random() * 2000 + 1000);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (!juegoIniciado) return;
+    const tiempoActual = Date.now();
+    const tiempoReaccion = tiempoActual - tiempoInicio;
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key) && !reacciones.some(r => r.tecla === e.key)) {
+      reacciones.push({ tecla: e.key, tiempo: tiempoReaccion });
+      resultados.innerHTML += `Tecla ${e.key}: ${tiempoReaccion} ms<br>`;
+      if (reacciones.length === 4) {
+        juegoIniciado = false;
+        determinarGanador();
+      }
+    }
+  });
+
+  function determinarGanador() {
+    const ganador = reacciones.reduce((prev, current) => (prev.tiempo < current.tiempo) ? prev : current);
+    resultados.innerHTML += `¡El ganador es la tecla ${ganador.tecla} con un tiempo de ${ganador.tiempo} ms!`;
+    // Reinicia el juego después de 5 segundos para dar tiempo a leer los resultados
+    setTimeout(() => {
+      prepararJuego();
+    }, 5000);
+  }
+
+  function prepararJuego() {
+    circulo.style.backgroundColor = 'red';
+    resultados.innerHTML = '';
+    reacciones = [];
+    cambiarColorDespuesDeUnRato();
+  }
+
+  cambiarColorDespuesDeUnRato(); // Inicia el juego
+</script>
+</body>
+</html>

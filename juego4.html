@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Saltos de Altura: Multijugador</title>
+<style>
+  body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; background-color: #f0f0f0; }
+  #juego { position: relative; width: 800px; height: 400px; background-color: #e0e0e0; overflow: hidden; }
+  .personaje { position: absolute; bottom: 0; width: 30px; height: 30px; background-color: #000; transition: bottom 0.5s; }
+  .obstaculo { position: absolute; bottom: 0; right: 0; width: 30px; height: 100px; background-color: orange; animation: mover 4s linear infinite; }
+  @keyframes mover {
+    from { transform: translateX(100%); }
+    to { transform: translateX(-100%); }
+  }
+</style>
+</head>
+<body>
+<div id="juego">
+  <div class="personaje" style="left: 100px;" data-key="ArrowUp"></div>
+  <div class="personaje" style="left: 300px;" data-key="ArrowDown"></div>
+  <div class="personaje" style="left: 500px;" data-key="ArrowLeft"></div>
+  <div class="personaje" style="left: 700px;" data-key="ArrowRight"></div>
+  <div class="obstaculo"></div>
+</div>
+<script>
+  const personajes = document.querySelectorAll('.personaje');
+  let intervalId;
+
+  document.addEventListener('keydown', function(e) {
+    personajes.forEach(personaje => {
+      if (personaje.dataset.key === e.key && !personaje.classList.contains('saltando')) {
+        personaje.style.bottom = '100px';
+        setTimeout(() => {
+          personaje.style.bottom = '0';
+          personaje.classList.remove('saltando');
+        }, 500);
+        personaje.classList.add('saltando');
+      }
+    });
+  });
+
+  function detectarColisiones() {
+    const obstaculo = document.querySelector('.obstaculo');
+    const obstaculoRect = obstaculo.getBoundingClientRect();
+
+    personajes.forEach(personaje => {
+      if (!personaje.classList.contains('saltando')) {
+        const personajeRect = personaje.getBoundingClientRect();
+        if (personajeRect.right > obstaculoRect.left && personajeRect.left < obstaculoRect.right &&
+            personajeRect.bottom < obstaculoRect.bottom + obstaculoRect.height) {
+          personaje.remove(); // Elimina el personaje en caso de colisión
+        }
+      }
+    });
+
+    if (document.querySelectorAll('.personaje').length <= 1) {
+      clearInterval(intervalId);
+      const ganador = document.querySelector('.personaje');
+      if (ganador) {
+        alert(`Juego terminado. Ganador: ${ganador.dataset.key}`);
+      } else {
+        alert("Todos los personajes han sido eliminados. No hay ganador.");
+      }
+    }
+  }
+
+  intervalId = setInterval(detectarColisiones, 100);
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Batalla de Ritmo</title>
+<style>
+  body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; gap: 20px; }
+  .secuencia { text-align: center; font-size: 24px; }
+  .instrucciones { text-align: center; }
+  .resultado { text-align: center; font-size: 20px; color: blue; }
+</style>
+</head>
+<body>
+<div class="instrucciones">Presta atención a la secuencia y repítela usando las flechas del teclado.</div>
+<div class="secuencia"></div>
+<div class="resultado"></div>
+<script>
+  const secuenciaDiv = document.querySelector('.secuencia');
+  const resultadoDiv = document.querySelector('.resultado');
+  let secuencia = [];
+  let entradaJugador = [];
+  let nivel = 1;
+
+  function generarSecuencia(nivel) {
+    const teclas = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+    secuencia = [];
+    for (let i = 0; i < nivel; i++) {
+      const teclaAleatoria = teclas[Math.floor(Math.random() * teclas.length)];
+      secuencia.push(teclaAleatoria);
+    }
+    mostrarSecuencia();
+  }
+
+  function mostrarSecuencia() {
+    secuenciaDiv.textContent = secuencia.join(', ');
+    setTimeout(() => {
+      secuenciaDiv.textContent = '';
+      escucharJugador();
+    }, nivel * 1000);
+  }
+
+  function escucharJugador() {
+    entradaJugador = [];
+    document.addEventListener('keydown', manejarEntradaJugador);
+  }
+
+  function manejarEntradaJugador(e) {
+    if (secuencia.length === entradaJugador.length) return;
+
+    const teclaCorrecta = secuencia[entradaJugador.length];
+    if (e.key === teclaCorrecta) {
+      entradaJugador.push(e.key);
+      if (secuencia.length === entradaJugador.length) {
+        document.removeEventListener('keydown', manejarEntradaJugador);
+        nivel++;
+        resultadoDiv.textContent = `¡Bien hecho! Pasaste al nivel ${nivel}.`;
+        setTimeout(() => {
+          resultadoDiv.textContent = '';
+          generarSecuencia(nivel);
+        }, 2000);
+      }
+    } else {
+      document.removeEventListener('keydown', manejarEntradaJugador);
+      resultadoDiv.textContent = `Error en la secuencia. Lograste llegar al nivel ${nivel}. Juego terminado.`;
+      nivel = 1; // Restablecer el nivel para el próximo intento
+    }
+  }
+
+  generarSecuencia(nivel);
+</script>
+</body>
+</html>
