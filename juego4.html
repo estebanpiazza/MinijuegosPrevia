@@ -7,10 +7,10 @@
   body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; background-color: #f0f0f0; }
   #juego { position: relative; width: 800px; height: 400px; background-color: #e0e0e0; overflow: hidden; }
   .personaje { position: absolute; bottom: 0; width: 30px; height: 30px; background-color: #000; transition: bottom 0.5s; }
-  .obstaculo { position: absolute; bottom: 0; right: 0; width: 30px; height: 100px; background-color: orange; animation: mover 4s linear infinite; }
+  .obstaculo { position: absolute; bottom: 0; right: 0; width: 30px; height: 100px; background-color: orange; animation: mover 2s linear infinite; }
   @keyframes mover {
-    from { transform: translateX(100%); }
-    to { transform: translateX(-100%); }
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
   }
 </style>
 </head>
@@ -25,6 +25,7 @@
 <script>
   const personajes = document.querySelectorAll('.personaje');
   let intervalId;
+  let velocidadAnimacion = 2000;
 
   document.addEventListener('keydown', function(e) {
     personajes.forEach(personaje => {
@@ -47,7 +48,8 @@
       if (!personaje.classList.contains('saltando')) {
         const personajeRect = personaje.getBoundingClientRect();
         if (personajeRect.right > obstaculoRect.left && personajeRect.left < obstaculoRect.right &&
-            personajeRect.bottom < obstaculoRect.bottom + obstaculoRect.height) {
+            personajeRect.bottom < obstaculoRect.bottom + obstaculoRect.height &&
+            personajeRect.bottom > obstaculoRect.top) {
           personaje.remove(); // Elimina el personaje en caso de colisión
         }
       }
@@ -62,6 +64,10 @@
         alert("Todos los personajes han sido eliminados. No hay ganador.");
       }
     }
+    
+    // Aumentar velocidad de animación
+    velocidadAnimacion -= 100;
+    document.querySelector('.obstaculo').style.animationDuration = velocidadAnimacion + 'ms';
   }
 
   intervalId = setInterval(detectarColisiones, 100);
